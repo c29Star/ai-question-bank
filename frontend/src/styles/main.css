@@ -1,0 +1,18 @@
+html, body, #app {
+  height: 100%;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #f5f7fa;
+}
+
+.page { max-width: 1200px; margin: 0 auto; padding: 24px; }
+.card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+.flex { display: flex; }
+.flex-1 { flex: 1; }
+.gap-8 { gap: 8px; }
+.gap-16 { gap: 16px; }
+.mb-16 { margin-bottom: 16px; }
+.mt-16 { margin-top: 16px; }
+.text-muted { color: #999; }
+.text-center { text-align: center; }
