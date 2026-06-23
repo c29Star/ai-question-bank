@@ -27,3 +27,16 @@ backend/target/
 Thumbs.db
 *.log
 logs/
+
+# Vite cache
+.vite/
+
+# Edge / Chrome 浏览器调试用户数据目录（不要上传）
+edge-*/
+
+# 临时 git commit message 文件
+.git-commit-msg-*.txt
+
+# 开发调试临时截图/预览
+preview-*.png
+preview-*.html
