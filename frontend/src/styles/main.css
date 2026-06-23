@@ -1,18 +1,721 @@
+/* ================================================================
+ *  智学云 · 春日校园设计系统 v2
+ *  主题：温暖 / 温柔 / 热情 / 柔和 / 舒适 + 校园感
+ *  配色灵感：阳光橙 + 樱花粉 + 薄荷青 + 薰衣紫 + 蜜桃黄
+ *           + 天空蓝 + 樱草绿 + 霞光红
+ *  设计理念：色彩更丰富、视觉更生动、层次更分明
+ * ================================================================ */
+
+:root {
+  /* ==============================================================
+   *  主色家族（8 色）—— 春日校园色谱
+   * ============================================================== */
+
+  /* 阳光橙金（温暖、阳光、积极） */
+  --brand-primary: #f97316;
+  --brand-primary-dark: #ea580c;
+  --brand-primary-light: #fb923c;
+  --brand-primary-soft: #ffedd5;
+  --brand-primary-ultra: #fff7ed;
+
+  /* 樱花粉（温柔、青春、少女） */
+  --brand-pink: #fb7185;
+  --brand-pink-dark: #e11d48;
+  --brand-pink-light: #fda4af;
+  --brand-pink-soft: #ffe4e6;
+  --brand-pink-ultra: #fff1f2;
+
+  /* 薄荷青（清新、成长、平静） */
+  --brand-mint: #14b8a6;
+  --brand-mint-dark: #0d9488;
+  --brand-mint-light: #5eead4;
+  --brand-mint-soft: #ccfbf1;
+  --brand-mint-ultra: #f0fdfa;
+
+  /* 薰衣紫（知性、专注、神秘） */
+  --brand-lavender: #a78bfa;
+  --brand-lavender-dark: #7c3aed;
+  --brand-lavender-light: #c4b5fd;
+  --brand-lavender-soft: #ede9fe;
+  --brand-lavender-ultra: #f5f3ff;
+
+  /* 蜜桃黄（柔和、舒适、温暖） */
+  --brand-peach: #fbbf24;
+  --brand-peach-dark: #f59e0b;
+  --brand-peach-light: #fde68a;
+  --brand-peach-soft: #fef3c7;
+  --brand-peach-ultra: #fffbeb;
+
+  /* 天空蓝（晴朗、广阔、理性） */
+  --brand-sky: #38bdf8;
+  --brand-sky-dark: #0284c7;
+  --brand-sky-light: #7dd3fc;
+  --brand-sky-soft: #e0f2fe;
+  --brand-sky-ultra: #f0f9ff;
+
+  /* 樱草绿（生机、青春、自然） */
+  --brand-grass: #84cc16;
+  --brand-grass-dark: #65a30d;
+  --brand-grass-light: #bef264;
+  --brand-grass-soft: #ecfccb;
+  --brand-grass-ultra: #f7fee7;
+
+  /* 霞光红（热情、活力、夕阳） */
+  --brand-coral: #f43f5e;
+  --brand-coral-dark: #be123c;
+  --brand-coral-light: #fb7185;
+  --brand-coral-soft: #ffe4e6;
+  --brand-coral-ultra: #fff1f2;
+
+  /* ==============================================================
+   *  背景：暖米白
+   * ============================================================== */
+  --bg-page: #fff8f1;
+  --bg-page-2: #fef3e8;
+  --bg-elevated: #ffffff;
+  --bg-warm: #fff7ed;
+  --bg-cool: #f0f9ff;
+
+  /* ==============================================================
+   *  中性色（暖灰）
+   * ============================================================== */
+  --gray-50:  #fafaf9;
+  --gray-100: #f5f5f4;
+  --gray-200: #e7e5e4;
+  --gray-300: #d6d3d1;
+  --gray-400: #a8a29e;
+  --gray-500: #78716c;
+  --gray-600: #57534e;
+  --gray-700: #44403c;
+  --gray-800: #292524;
+  --gray-900: #1c1917;
+
+  /* ==============================================================
+   *  语义色
+   * ============================================================== */
+  --success: #14b8a6;
+  --success-soft: #ccfbf1;
+  --warning: #f59e0b;
+  --warning-soft: #fef3c7;
+  --danger: #ef4444;
+  --danger-soft: #fee2e2;
+  --info: #a78bfa;
+  --info-soft: #ede9fe;
+
+  /* ==============================================================
+   *  渐变（更丰富的彩虹系）
+   * ============================================================== */
+  --gradient-primary:    linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+  --gradient-warm:       linear-gradient(135deg, #fb7185 0%, #fb923c 100%);
+  --gradient-spring:     linear-gradient(135deg, #fb923c 0%, #fb7185 50%, #c4b5fd 100%);
+  --gradient-sunset:     linear-gradient(135deg, #fbbf24 0%, #fb7185 50%, #a78bfa 100%);
+  --gradient-mint:       linear-gradient(135deg, #5eead4 0%, #14b8a6 100%);
+  --gradient-sky:        linear-gradient(135deg, #7dd3fc 0%, #38bdf8 100%);
+  --gradient-grass:      linear-gradient(135deg, #bef264 0%, #84cc16 100%);
+  --gradient-coral:      linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
+
+  /* 彩虹渐变 —— 校园感彩带 */
+  --gradient-rainbow:    linear-gradient(135deg,
+    #fbbf24 0%, #fb923c 18%, #fb7185 36%,
+    #c4b5fd 54%, #7dd3fc 72%, #5eead4 90%, #bef264 100%);
+
+  /* 校园感的多色背景渐变（更丰富版） */
+  --gradient-page:       linear-gradient(135deg,
+    #fff7ed 0%, #fef3c7 18%, #ffe4e6 36%,
+    #ede9fe 54%, #e0f2fe 72%, #ccfbf1 90%, #ecfccb 100%);
+
+  /* 柔和的暖色背景（默认） */
+  --gradient-page-warm:  linear-gradient(180deg, #fff7ed 0%, #fef3e8 50%, #fff1f2 100%);
+
+  /* ==============================================================
+   *  阴影（更柔和、更丰富）
+   * ============================================================== */
+  --shadow-sm:    0 1px 3px rgba(251, 146, 60, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow:       0 2px 8px rgba(251, 146, 60, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md:    0 6px 16px rgba(251, 146, 60, 0.10), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-lg:    0 12px 32px rgba(251, 113, 133, 0.14), 0 4px 8px rgba(0, 0, 0, 0.04);
+
+  /* 彩色阴影（多色） */
+  --shadow-pink:     0 8px 24px rgba(251, 113, 133, 0.22);
+  --shadow-mint:     0 8px 24px rgba(20, 184, 166, 0.20);
+  --shadow-lavender: 0 8px 24px rgba(167, 139, 250, 0.22);
+  --shadow-peach:    0 8px 24px rgba(251, 191, 36, 0.22);
+  --shadow-sky:      0 8px 24px rgba(56, 189, 248, 0.22);
+  --shadow-grass:    0 8px 24px rgba(132, 204, 22, 0.22);
+  --shadow-rainbow:  0 12px 32px rgba(251, 113, 133, 0.18),
+                     0 4px 12px rgba(167, 139, 250, 0.12),
+                     0 2px 6px rgba(56, 189, 248, 0.10);
+
+  /* ==============================================================
+   *  圆角
+   * ============================================================== */
+  --radius-sm: 6px;
+  --radius:    10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+
+  /* ==============================================================
+   *  Element Plus 主题色覆盖
+   * ============================================================== */
+  --el-color-primary: #f97316;
+  --el-color-primary-rgb: 249, 115, 22;
+  --el-color-primary-light-3: #fb923c;
+  --el-color-primary-light-5: #fed7aa;
+  --el-color-primary-light-7: #ffedd5;
+  --el-color-primary-light-9: #fff7ed;
+  --el-color-primary-dark-2: #ea580c;
+
+  --el-color-success: #14b8a6;
+  --el-color-success-rgb: 20, 184, 166;
+  --el-color-success-light-3: #5eead4;
+  --el-color-success-light-5: #ccfbf1;
+  --el-color-success-light-7: #ccfbf1;
+  --el-color-success-light-9: #f0fdfa;
+  --el-color-success-dark-2: #0d9488;
+
+  --el-color-warning: #f59e0b;
+  --el-color-warning-rgb: 245, 158, 11;
+  --el-color-warning-light-3: #fbbf24;
+  --el-color-warning-light-5: #fef3c7;
+  --el-color-warning-light-7: #fef3c7;
+  --el-color-warning-light-9: #fffbeb;
+  --el-color-warning-dark-2: #d97706;
+
+  --el-color-danger:  #fb7185;
+  --el-color-danger-rgb: 251, 113, 133;
+  --el-color-danger-light-3: #fda4af;
+  --el-color-danger-light-5: #ffe4e6;
+  --el-color-danger-light-7: #ffe4e6;
+  --el-color-danger-light-9: #fff1f2;
+  --el-color-danger-dark-2: #e11d48;
+
+  --el-color-error:   #fb7185;
+  --el-color-error-rgb: 251, 113, 133;
+  --el-color-error-light-3: #fda4af;
+  --el-color-error-light-5: #ffe4e6;
+  --el-color-error-light-7: #ffe4e6;
+  --el-color-error-light-9: #fff1f2;
+  --el-color-error-dark-2: #e11d48;
+
+  --el-color-info:    #a78bfa;
+  --el-color-info-rgb: 167, 139, 250;
+  --el-color-info-light-3: #c4b5fd;
+  --el-color-info-light-5: #ede9fe;
+  --el-color-info-light-7: #ede9fe;
+  --el-color-info-light-9: #f5f3ff;
+  --el-color-info-dark-2: #7c3aed;
+}
+
+/* ================================================================
+ *  全局
+ * ================================================================ */
 html, body, #app {
   height: 100%;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-  background: #f5f7fa;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  background: var(--gradient-page-warm);
+  background-attachment: fixed;
+  color: var(--gray-800);
+  font-size: 14px;
 }
 
-.page { max-width: 1200px; margin: 0 auto; padding: 24px; }
-.card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-.toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+* { box-sizing: border-box; }
+
+a { color: var(--brand-primary); text-decoration: none; }
+a:hover { color: var(--brand-primary-dark); }
+
+/* ================================================================
+ *  全局装饰光斑（让背景更有色彩感，不只是纯色）
+ * ================================================================ */
+body::before {
+  content: '';
+  position: fixed;
+  top: -10%;
+  left: -5%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(251, 146, 60, 0.18) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(40px);
+}
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -15%;
+  right: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(251, 113, 133, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(50px);
+}
+
+/* #app 关键修正：不能是 position:relative。
+   否则 Element Plus dialog 的 fixed 定位会以 #app 为基准，
+   导致遮罩和弹窗只覆盖 #app 的可见高度（视口的一部分）。
+   改为 static + min-height 占满 + z-index 高于装饰光斑。 */
+#app {
+  min-height: 100%;
+  z-index: 1;
+}
+
+/* ================================================================
+ *  Element Plus Dialog 弹窗遮罩：强制铺满整个 viewport
+ *  即使 dialog 被插入到 #app 子树（teleported=false 时），
+ * 也能保证 fixed 定位以视口为基准，遮罩/弹窗全屏显示。
+ * ================================================================ */
+:deep(.el-overlay),
+:deep(.el-overlay-dialog) {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  z-index: 2000 !important;
+}
+:deep(.el-overlay-dialog) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: auto !important;
+}
+/* q-edit-dialog / q-preview-dialog 在 Questions.vue 里设了 width:100% + height:100vh，
+   但当 dialog 不在 body 子树时 100% 是相对父容器而非 viewport。
+   强制以 viewport 为基准。 */
+:deep(.q-edit-dialog .el-dialog),
+:deep(.q-preview-dialog .el-dialog) {
+  margin: 0 auto !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  left: 0 !important;
+  top: 0 !important;
+  transform: none !important;
+  border-radius: 0 !important;
+}
+
+/* ================================================================
+ *  Element Plus 组件统一风格
+ * ================================================================ */
+
+/* 卡片：去掉默认边框，用柔和阴影 + 暖色调 + 微妙渐变 */
+:deep(.el-card) {
+  border: none;
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius-md);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+:deep(.el-card:hover) {
+  box-shadow: var(--shadow-md);
+}
+:deep(.el-card__header) {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-100);
+  background: transparent;
+  font-weight: 600;
+  color: var(--gray-800);
+}
+:deep(.el-card__body) { padding: 20px; }
+
+/* 表格 */
+:deep(.el-table) {
+  border-radius: var(--radius);
+  overflow: hidden;
+  --el-table-border-color: var(--gray-100);
+}
+:deep(.el-table th.el-table__cell) {
+  background: linear-gradient(180deg, #fff7ed 0%, #fef3e8 100%) !important;
+  color: var(--gray-700);
+  font-weight: 600;
+  font-size: 13px;
+}
+:deep(.el-table tr:hover > td.el-table__cell) {
+  background: var(--brand-peach-soft) !important;
+}
+
+/* 按钮：渐变 + 阴影 */
+:deep(.el-button) {
+  font-weight: 500;
+  border-radius: var(--radius);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+:deep(.el-button--primary) {
+  --el-button-bg-color: #f97316 !important;
+  --el-button-border-color: #f97316 !important;
+  --el-button-hover-bg-color: #ea580c !important;
+  --el-button-hover-border-color: #ea580c !important;
+  --el-button-active-bg-color: #ea580c !important;
+  background: var(--gradient-primary) !important;
+  border: none !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.30);
+}
+:deep(.el-button--primary:hover) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(249, 115, 22, 0.40) !important;
+  filter: brightness(1.05);
+}
+:deep(.el-button--success) {
+  background: var(--gradient-mint) !important;
+  border: none !important;
+  color: #fff !important;
+}
+:deep(.el-button--danger) {
+  background: var(--gradient-coral) !important;
+  border: none !important;
+  color: #fff !important;
+}
+:deep(.el-button--warning) {
+  background: linear-gradient(135deg, #fde68a 0%, #fbbf24 50%, #f59e0b 100%) !important;
+  border: none !important;
+  color: #92400e !important;
+}
+:deep(.el-button--info) {
+  background: var(--gradient-sky) !important;
+  border: none !important;
+  color: #fff !important;
+}
+:deep(.el-button + .el-button) { margin-left: 8px; }
+
+/* 菜单 */
+:deep(.el-menu) { border-right: none !important; }
+:deep(.el-menu-item) {
+  transition: all 0.25s ease;
+  border-radius: var(--radius);
+  margin: 4px 8px;
+  height: 44px;
+  line-height: 44px;
+}
+:deep(.el-menu-item:hover) {
+  background: var(--brand-peach-soft) !important;
+  color: var(--brand-primary-dark) !important;
+}
+:deep(.el-menu-item.is-active) {
+  background: var(--gradient-primary) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.28);
+}
+
+/* 输入框聚焦：暖色高亮 */
+:deep(.el-input__wrapper) {
+  border-radius: var(--radius);
+  transition: all 0.25s ease;
+}
+:deep(.el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 2px var(--brand-primary-soft) inset !important;
+}
+:deep(.el-textarea__inner:focus) {
+  border-color: var(--brand-primary) !important;
+  box-shadow: 0 0 0 2px var(--brand-primary-soft) !important;
+}
+
+/* Tag —— 彩色 Tag 风格 */
+:deep(.el-tag) {
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  border: none;
+}
+:deep(.el-tag--primary) {
+  background: var(--brand-primary-soft) !important;
+  color: var(--brand-primary-dark) !important;
+}
+:deep(.el-tag--success) {
+  background: var(--success-soft) !important;
+  color: var(--success) !important;
+}
+:deep(.el-tag--warning) {
+  background: var(--warning-soft) !important;
+  color: #b45309 !important;
+}
+:deep(.el-tag--danger) {
+  background: var(--danger-soft) !important;
+  color: var(--danger) !important;
+}
+:deep(.el-tag--info) {
+  background: var(--info-soft) !important;
+  color: var(--brand-lavender-dark) !important;
+}
+
+/* Pagination */
+:deep(.el-pagination .btn-prev),
+:deep(.el-pagination .btn-next),
+:deep(.el-pagination .el-pager li) {
+  border-radius: var(--radius-sm);
+  background: #fff;
+}
+:deep(.el-pagination .el-pager li.is-active) {
+  background: var(--gradient-primary) !important;
+  color: #fff !important;
+}
+
+/* Dialog */
+:deep(.el-dialog) {
+  border-radius: var(--radius-lg) !important;
+  overflow: hidden;
+}
+:deep(.el-dialog__header) {
+  background: var(--gradient-page-warm);
+  margin-right: 0 !important;
+  padding: 20px 24px !important;
+}
+
+/* Tabs */
+:deep(.el-tabs__item) {
+  font-weight: 500;
+  color: var(--gray-600);
+}
+:deep(.el-tabs__item.is-active) {
+  color: var(--brand-primary-dark) !important;
+}
+:deep(.el-tabs__active-bar) {
+  background: var(--gradient-primary) !important;
+  height: 3px !important;
+  border-radius: 3px;
+}
+
+/* Progress */
+:deep(.el-progress-bar__outer) {
+  background: var(--brand-peach-soft) !important;
+  border-radius: 999px;
+}
+:deep(.el-progress-bar__inner) {
+  background: var(--gradient-primary) !important;
+  border-radius: 999px;
+}
+
+/* Switch */
+:deep(.el-switch.is-checked .el-switch__core) {
+  background: var(--gradient-primary) !important;
+  border-color: var(--brand-primary) !important;
+}
+
+/* Radio / Checkbox */
+:deep(.el-radio__input.is-checked .el-radio__inner) {
+  background: var(--brand-primary) !important;
+  border-color: var(--brand-primary) !important;
+}
+:deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
+  background: var(--brand-primary) !important;
+  border-color: var(--brand-primary) !important;
+}
+
+/* Empty */
+:deep(.el-empty__description p) {
+  color: var(--gray-500);
+}
+
+/* Notification */
+:deep(.el-notification) {
+  border-radius: var(--radius-md) !important;
+  border: none !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Message Box */
+:deep(.el-message-box) {
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* ================================================================
+ *  滚动条 —— 彩色渐变
+ * ================================================================ */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #fb923c 0%, #fb7185 50%, #a78bfa 100%);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #f97316 0%, #e11d48 50%, #7c3aed 100%);
+}
+
+/* ================================================================
+ *  工具类
+ * ================================================================ */
+.page-container { padding: 20px 24px; }
 .flex { display: flex; }
 .flex-1 { flex: 1; }
 .gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
 .gap-16 { gap: 16px; }
+.mb-12 { margin-bottom: 12px; }
 .mb-16 { margin-bottom: 16px; }
+.mt-12 { margin-top: 12px; }
 .mt-16 { margin-top: 16px; }
-.text-muted { color: #999; }
+.text-muted { color: var(--gray-500); }
 .text-center { text-align: center; }
+
+/* ================================================================
+ *  动效
+ * ================================================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) both; }
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-12px) rotate(3deg); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.05); opacity: 0.9; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes drift {
+  0%   { transform: translateX(0) translateY(0); }
+  25%  { transform: translateX(8px) translateY(-6px); }
+  50%  { transform: translateX(0) translateY(-12px); }
+  75%  { transform: translateX(-8px) translateY(-6px); }
+  100% { transform: translateX(0) translateY(0); }
+}
+
+.count-up { transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+
+/* ================================================================
+ *  通用装饰：玻璃态卡片
+ * ================================================================ */
+.glass-card {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+}
+
+/* ================================================================
+ *  渐变文字（多个变体）
+ * ================================================================ */
+.gradient-text {
+  background: var(--gradient-warm);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.gradient-text-spring {
+  background: var(--gradient-spring);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.gradient-text-sunset {
+  background: var(--gradient-sunset);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.gradient-text-rainbow {
+  background: var(--gradient-rainbow);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  background-size: 200% auto;
+  animation: shimmer 6s linear infinite;
+}
+.gradient-text-mint {
+  background: var(--gradient-mint);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.gradient-text-sky {
+  background: var(--gradient-sky);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ================================================================
+ *  标题分隔小彩点 + 彩虹条
+ * ================================================================ */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin-bottom: 16px;
+}
+.section-title::before {
+  content: "";
+  width: 4px;
+  height: 16px;
+  background: var(--gradient-rainbow);
+  background-size: 200% 100%;
+  border-radius: 999px;
+  animation: shimmer 4s linear infinite;
+}
+
+/* ================================================================
+ *  通用彩色装饰小元素
+ * ================================================================ */
+
+/* 彩虹分隔条 */
+.rainbow-divider {
+  height: 3px;
+  background: var(--gradient-rainbow);
+  background-size: 200% 100%;
+  border-radius: 999px;
+  animation: shimmer 8s linear infinite;
+  margin: 16px 0;
+}
+
+/* 彩色光晕背景小工具（用于 hero / 欢迎区） */
+.aurora-bg {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #fb923c 0%, #fb7185 40%, #c4b5fd 80%, #7dd3fc 100%);
+}
+
+/* 彩点网格背景（用于空状态/装饰） */
+.dot-grid-bg {
+  background-image:
+    radial-gradient(circle, rgba(251, 146, 60, 0.10) 1.5px, transparent 1.5px),
+    radial-gradient(circle, rgba(251, 113, 133, 0.10) 1.5px, transparent 1.5px),
+    radial-gradient(circle, rgba(167, 139, 250, 0.10) 1.5px, transparent 1.5px);
+  background-size: 24px 24px, 24px 24px, 24px 24px;
+  background-position: 0 0, 12px 12px, 6px 18px;
+}
+
+/* 通用柔和投影（彩色） */
+.glow-orange  { box-shadow: 0 8px 24px rgba(251, 146, 60, 0.25); }
+.glow-pink    { box-shadow: 0 8px 24px rgba(251, 113, 133, 0.25); }
+.glow-mint    { box-shadow: 0 8px 24px rgba(20, 184, 166, 0.25); }
+.glow-lavender{ box-shadow: 0 8px 24px rgba(167, 139, 250, 0.25); }
+.glow-peach   { box-shadow: 0 8px 24px rgba(251, 191, 36, 0.25); }
+.glow-sky     { box-shadow: 0 8px 24px rgba(56, 189, 248, 0.25); }
+.glow-grass   { box-shadow: 0 8px 24px rgba(132, 204, 22, 0.25); }
