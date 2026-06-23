@@ -19,6 +19,10 @@ public class Paper {
     private Integer duration;
     private Long createdBy;
 
+    /** 非持久化字段：详情接口动态注入学科名，给前端预览弹窗用 */
+    @TableField(exist = false)
+    private String subjectName;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 

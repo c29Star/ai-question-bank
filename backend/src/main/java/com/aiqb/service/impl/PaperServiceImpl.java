@@ -6,19 +6,27 @@ import com.aiqb.dto.PaperDTO;
 import com.aiqb.entity.Paper;
 import com.aiqb.entity.PaperQuestion;
 import com.aiqb.entity.Question;
+import com.aiqb.entity.Subject;
 import com.aiqb.mapper.PaperMapper;
 import com.aiqb.mapper.PaperQuestionMapper;
 import com.aiqb.mapper.QuestionMapper;
+import com.aiqb.mapper.SubjectMapper;
 import com.aiqb.service.PaperService;
 import com.aiqb.service.QuestionService;
 import com.aiqb.vo.PaperDetailVO;
+import com.aiqb.vo.PaperVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +35,35 @@ public class PaperServiceImpl implements PaperService {
     private final PaperMapper paperMapper;
     private final PaperQuestionMapper paperQuestionMapper;
     private final QuestionMapper questionMapper;
+    private final SubjectMapper subjectMapper;
     private final QuestionService questionService;
+
+    @Override
+    public IPage<PaperVO> page(Long subjectId, Integer current, Integer size) {
+        LambdaQueryWrapper<Paper> wrapper = new LambdaQueryWrapper<>();
+        if (subjectId != null) wrapper.eq(Paper::getSubjectId, subjectId);
+        wrapper.orderByDesc(Paper::getId);
+        IPage<Paper> pg = paperMapper.selectPage(new Page<>(current, size), wrapper);
+        return pg.convert(this::toVO);
+    }
+
+    @Override
+    public List<PaperVO> listVO(Long subjectId) {
+        LambdaQueryWrapper<Paper> wrapper = new LambdaQueryWrapper<>();
+        if (subjectId != null) wrapper.eq(Paper::getSubjectId, subjectId);
+        wrapper.orderByDesc(Paper::getId);
+        return paperMapper.selectList(wrapper).stream().map(this::toVO).collect(Collectors.toList());
+    }
+
+    private PaperVO toVO(Paper p) {
+        String subjectName = null;
+        if (p.getSubjectId() != null) {
+            Subject s = subjectMapper.selectById(p.getSubjectId());
+            if (s != null) subjectName = s.getName();
+        }
+        Integer count = paperQuestionMapper.selectCountByPaperId(p.getId());
+        return PaperVO.from(p, subjectName, count == null ? 0 : count);
+    }
 
     @Override
     public List<Paper> list(Long subjectId) {
@@ -48,6 +84,16 @@ public class PaperServiceImpl implements PaperService {
             Question q = questionMapper.selectById(pq.getQuestionId());
             if (q != null) questions.add(q);
         }
+
+        // 关键：给 paper 注入 subjectName，前端预览弹窗要用
+        if (paper.getSubjectId() != null) {
+            Subject s = subjectMapper.selectById(paper.getSubjectId());
+            if (s != null) {
+                // 用 transient 字段（不持久化到 DB），仅用于返回 JSON
+                paper.setSubjectName(s.getName());
+            }
+        }
+
         PaperDetailVO vo = new PaperDetailVO();
         vo.setPaper(paper);
         vo.setQuestions(questions);
@@ -111,18 +157,25 @@ public class PaperServiceImpl implements PaperService {
         paper.setCreatedBy(userId);
         paperMapper.insert(paper);
 
-        // 2. 按规则抽题
+        // 2. 按规则抽题（多规则间自动去重）
         List<Long> allQuestionIds = new ArrayList<>();
         List<Integer> allScores = new ArrayList<>();
+        java.util.Set<Long> usedIds = new java.util.HashSet<>();
         for (AutoPaperDTO.PaperRule rule : dto.getRules()) {
+            // 每次多抽一些以补偿去重过滤
+            int want = rule.getCount();
             List<Question> picked = questionService.randomPick(
                     dto.getSubjectId(), rule.getType(), rule.getDifficulty(),
-                    rule.getKnowledgePoint(), rule.getCount());
-            if (picked.size() < rule.getCount()) {
+                    rule.getKnowledgePoint(), want * 2, null);
+            // 过滤掉已用题
+            picked = picked.stream().filter(q -> !usedIds.contains(q.getId())).collect(Collectors.toList());
+            if (picked.size() < want) {
                 throw BusinessException.badRequest(
-                        "题型 " + rule.getType() + " 数量不足：需要 " + rule.getCount() + "，仅有 " + picked.size());
+                        "题型 " + rule.getType() + " 数量不足：需要 " + want + "，仅有 " + picked.size() + "（去重后）");
             }
-            for (Question q : picked) {
+            for (int i = 0; i < want; i++) {
+                Question q = picked.get(i);
+                usedIds.add(q.getId());
                 allQuestionIds.add(q.getId());
                 allScores.add(rule.getScore());
             }

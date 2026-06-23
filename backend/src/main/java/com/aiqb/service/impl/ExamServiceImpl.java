@@ -9,6 +9,7 @@ import com.aiqb.service.ExamService;
 import com.aiqb.vo.ExamQuestionVO;
 import com.aiqb.vo.ExamResultVO;
 import com.aiqb.vo.ExamStartVO;
+import com.aiqb.vo.ExamVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -36,6 +37,8 @@ public class ExamServiceImpl implements ExamService {
     private final ExamRecordMapper examRecordMapper;
     private final AnswerMapper answerMapper;
     private final WrongQuestionMapper wrongQuestionMapper;
+    private final com.aiqb.mapper.SubjectMapper subjectMapper;
+    private final com.aiqb.mapper.UserMapper userMapper;
 
     @Override
     @Transactional
@@ -93,11 +96,19 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public IPage<Exam> page(Integer pageNum, Integer pageSize, String status) {
+    public IPage<ExamVO> page(Integer pageNum, Integer pageSize, String status) {
         LambdaQueryWrapper<Exam> wrapper = new LambdaQueryWrapper<>();
         if (status != null && !status.isEmpty()) wrapper.eq(Exam::getStatus, status);
         wrapper.orderByDesc(Exam::getId);
-        return examMapper.selectPage(new Page<>(pageNum, pageSize), wrapper);
+        IPage<Exam> pg = examMapper.selectPage(new Page<>(pageNum, pageSize), wrapper);
+        return pg.convert(e -> {
+            String paperName = null;
+            if (e.getPaperId() != null) {
+                Paper p = paperMapper.selectById(e.getPaperId());
+                if (p != null) paperName = p.getTitle();
+            }
+            return ExamVO.from(e, paperName);
+        });
     }
 
     @Override
@@ -162,6 +173,7 @@ public class ExamServiceImpl implements ExamService {
             Paper paper = paperMapper.selectById(exam.getPaperId());
             record.setTotalScore(paper.getTotalScore());
             record.setStatus("IN_PROGRESS");
+            record.setStartTime(LocalDateTime.now());
             examRecordMapper.insert(record);
 
             // 同步更新 exam.status 为 ONGOING
@@ -299,6 +311,39 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public List<Map<String, Object>> myRecords(Long userId) {
         return examRecordMapper.selectWithDetail(userId);
+    }
+
+    @Override
+    public List<Map<String, Object>> examRecords(Long examId) {
+        // 教师视角：列出这场考试所有学生的 record（含用户名、得分、用时、状态）
+        LambdaQueryWrapper<ExamRecord> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ExamRecord::getExamId, examId).orderByDesc(ExamRecord::getScore);
+        List<ExamRecord> records = examRecordMapper.selectList(wrapper);
+        List<Map<String, Object>> out = new ArrayList<>();
+        for (ExamRecord r : records) {
+            Map<String, Object> m = new HashMap<>();
+            m.put("recordId", r.getId());
+            m.put("userId", r.getUserId());
+            m.put("username", userNickname(r.getUserId()));
+            m.put("paperId", r.getPaperId());
+            m.put("score", r.getScore());
+            m.put("totalScore", r.getTotalScore());
+            m.put("status", r.getStatus());
+            m.put("startTime", r.getStartTime());
+            m.put("submitTime", r.getSubmitTime());
+            m.put("durationUsed", r.getDurationUsed());
+            out.add(m);
+        }
+        return out;
+    }
+
+    private String userNickname(Long userId) {
+        try {
+            com.aiqb.entity.User u = userMapper.selectById(userId);
+            return u != null ? u.getNickname() : ("user#" + userId);
+        } catch (Exception e) {
+            return "user#" + userId;
+        }
     }
 
     // ============== 私有方法 ==============

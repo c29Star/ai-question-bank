@@ -45,6 +45,7 @@ CREATE TABLE `questions` (
     `answer` VARCHAR(500) NOT NULL COMMENT '答案',
     `explanation` TEXT COMMENT '解析',
     `knowledge_point` VARCHAR(255) COMMENT '知识点/考点',
+    `score` INT NOT NULL DEFAULT 5 COMMENT '题目默认分值',
     `created_by` BIGINT COMMENT '创建人',
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

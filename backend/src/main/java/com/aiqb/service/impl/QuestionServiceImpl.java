@@ -3,8 +3,11 @@ package com.aiqb.service.impl;
 import com.aiqb.common.BusinessException;
 import com.aiqb.dto.QuestionDTO;
 import com.aiqb.entity.Question;
+import com.aiqb.entity.Subject;
 import com.aiqb.mapper.QuestionMapper;
+import com.aiqb.mapper.SubjectMapper;
 import com.aiqb.service.QuestionService;
+import com.aiqb.vo.QuestionVO;
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -19,7 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -27,18 +32,37 @@ import java.util.List;
 public class QuestionServiceImpl implements QuestionService {
 
     private final QuestionMapper questionMapper;
+    private final SubjectMapper subjectMapper;
 
     @Override
-    public IPage<Question> page(Long subjectId, String type, String keyword, Integer pageNum, Integer pageSize) {
+    public IPage<Question> page(Long subjectId, String type, String keyword, Integer difficulty, Integer pageNum, Integer pageSize) {
+        log.info("[Question.page] subjectId={}, type={}, keyword={}, difficulty={}, pageNum={}, pageSize={}",
+                subjectId, type, keyword, difficulty, pageNum, pageSize);
         LambdaQueryWrapper<Question> wrapper = new LambdaQueryWrapper<>();
         if (subjectId != null) wrapper.eq(Question::getSubjectId, subjectId);
         if (type != null && !type.isEmpty()) wrapper.eq(Question::getType, type);
+        if (difficulty != null) wrapper.eq(Question::getDifficulty, difficulty);
         if (keyword != null && !keyword.isEmpty()) {
             wrapper.and(w -> w.like(Question::getContent, keyword)
                     .or().like(Question::getKnowledgePoint, keyword));
         }
         wrapper.orderByDesc(Question::getId);
         return questionMapper.selectPage(new Page<>(pageNum, pageSize), wrapper);
+    }
+
+    @Override
+    public IPage<QuestionVO> pageVO(Long subjectId, String type, String keyword, Integer difficulty, Integer current, Integer size) {
+        IPage<Question> pg = page(subjectId, type, keyword, difficulty, current, size);
+        // 批量取科目名
+        List<Question> records = pg.getRecords();
+        Map<Long, String> subjectNameMap = new HashMap<>();
+        for (Question q : records) {
+            if (q.getSubjectId() != null && !subjectNameMap.containsKey(q.getSubjectId())) {
+                Subject s = subjectMapper.selectById(q.getSubjectId());
+                subjectNameMap.put(q.getSubjectId(), s == null ? null : s.getName());
+            }
+        }
+        return pg.convert(q -> QuestionVO.from(q, subjectNameMap.get(q.getSubjectId())));
     }
 
     @Override
@@ -76,7 +100,12 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public List<Question> randomPick(Long subjectId, String type, Integer difficulty, String knowledgePoint, Integer limit) {
-        return questionMapper.randomPick(subjectId, type, difficulty, knowledgePoint, limit);
+        return questionMapper.randomPick(subjectId, type, difficulty, knowledgePoint, limit, null);
+    }
+
+    @Override
+    public List<Question> randomPick(Long subjectId, String type, Integer difficulty, String knowledgePoint, Integer limit, Long excludeId) {
+        return questionMapper.randomPick(subjectId, type, difficulty, knowledgePoint, limit, excludeId);
     }
 
     @Override
@@ -164,5 +193,6 @@ public class QuestionServiceImpl implements QuestionService {
         q.setAnswer(dto.getAnswer());
         q.setExplanation(dto.getExplanation());
         q.setKnowledgePoint(dto.getKnowledgePoint());
+        q.setScore(dto.getScore() != null ? dto.getScore() : 5);
     }
 }

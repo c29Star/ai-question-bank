@@ -48,7 +48,8 @@ public class StatsServiceImpl implements StatsService {
         List<Map<String, Object>> wrongDist = questionMapper.countByKnowledge(userId);
 
         // 4. 错题总数 & 已掌握
-        long wrongTotal = records.stream().mapToLong(r -> 0).sum(); // 简化
+        long wrongTotal = wrongQuestionMapper.selectCount(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<com.aiqb.entity.WrongQuestion>()
+                .eq(com.aiqb.entity.WrongQuestion::getUserId, userId));
         long masteredCount = wrongQuestionMapper.selectCount(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<com.aiqb.entity.WrongQuestion>()
                 .eq(com.aiqb.entity.WrongQuestion::getUserId, userId)
                 .eq(com.aiqb.entity.WrongQuestion::getMastered, true));

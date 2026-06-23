@@ -21,7 +21,7 @@ public class AutoPaperDTO {
         /** SINGLE / MULTIPLE / JUDGE / ESSAY */
         private String type;
         private Integer count;
-        private Integer score;
+        private Integer score = 5;     // 默认每题 5 分（前端不传也能跑）
         private Integer difficulty;
         private String knowledgePoint;
     }

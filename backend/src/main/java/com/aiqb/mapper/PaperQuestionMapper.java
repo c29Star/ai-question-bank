@@ -16,4 +16,7 @@ public interface PaperQuestionMapper extends BaseMapper<PaperQuestion> {
 
     @Delete("DELETE FROM paper_questions WHERE paper_id = #{paperId}")
     int deleteByPaperId(Long paperId);
+
+    @Select("SELECT COUNT(*) FROM paper_questions WHERE paper_id = #{paperId}")
+    Integer selectCountByPaperId(Long paperId);
 }

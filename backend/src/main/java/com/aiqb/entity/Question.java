@@ -22,6 +22,8 @@ public class Question {
     private String answer;
     private String explanation;
     private String knowledgePoint;
+    /** 题目的默认分值（录入时由用户填写，组卷时可直接采用） */
+    private Integer score;
     private Long createdBy;
 
     @TableField(fill = FieldFill.INSERT)

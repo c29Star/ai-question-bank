@@ -1,9 +1,11 @@
 package com.aiqb.controller;
 
+import com.aiqb.common.BusinessException;
 import com.aiqb.common.Result;
 import com.aiqb.dto.QuestionDTO;
 import com.aiqb.entity.Question;
 import com.aiqb.service.QuestionService;
+import com.aiqb.vo.QuestionVO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,15 +28,16 @@ public class QuestionController {
 
     private final QuestionService questionService;
 
-    @Operation(summary = "分页查询")
+    @Operation(summary = "分页查询（带 subjectName）")
     @GetMapping
-    public Result<IPage<Question>> page(
+    public Result<IPage<QuestionVO>> page(
             @RequestParam(required = false) Long subjectId,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String keyword,
-            @RequestParam(defaultValue = "1") Integer pageNum,
-            @RequestParam(defaultValue = "10") Integer pageSize) {
-        return Result.success(questionService.page(subjectId, type, keyword, pageNum, pageSize));
+            @RequestParam(required = false) Integer difficulty,
+            @RequestParam(defaultValue = "1") Integer current,
+            @RequestParam(defaultValue = "10") Integer size) {
+        return Result.success(questionService.pageVO(subjectId, type, keyword, difficulty, current, size));
     }
 
     @Operation(summary = "获取详情")
@@ -56,10 +59,12 @@ public class QuestionController {
         return Result.success("更新成功", null);
     }
 
-    @Operation(summary = "删除题目")
+    @Operation(summary = "删除题目（支持单 id 或多个 id）")
     @DeleteMapping
-    public Result<Void> delete(@RequestBody List<Long> ids) {
-        questionService.delete(ids);
+    public Result<Void> delete(@RequestParam(required = false) Long id, @RequestBody(required = false) List<Long> ids) {
+        if (id != null) questionService.delete(List.of(id));
+        else if (ids != null && !ids.isEmpty()) questionService.delete(ids);
+        else throw BusinessException.badRequest("缺少 id 参数");
         return Result.success("删除成功", null);
     }
 

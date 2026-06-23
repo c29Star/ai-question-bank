@@ -22,7 +22,8 @@ public interface QuestionMapper extends BaseMapper<Question> {
                               @Param("type") String type,
                               @Param("difficulty") Integer difficulty,
                               @Param("knowledgePoint") String knowledgePoint,
-                              @Param("limit") Integer limit);
+                              @Param("limit") Integer limit,
+                              @Param("excludeId") Long excludeId);
 
     /**
      * 按知识点统计错题数

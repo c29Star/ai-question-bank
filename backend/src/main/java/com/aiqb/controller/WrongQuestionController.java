@@ -3,6 +3,8 @@ package com.aiqb.controller;
 import com.aiqb.common.Result;
 import com.aiqb.security.LoginUser;
 import com.aiqb.service.WrongQuestionService;
+import com.aiqb.vo.WrongQuestionVO;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +22,20 @@ public class WrongQuestionController {
 
     private final WrongQuestionService wrongQuestionService;
 
-    @Operation(summary = "我的错题")
+    @Operation(summary = "我的错题（分页）")
     @GetMapping
-    public Result<List<Map<String, Object>>> myWrong(
+    public Result<IPage<WrongQuestionVO>> page(
+            @AuthenticationPrincipal LoginUser user,
+            @RequestParam(required = false) Boolean mastered,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "1") Integer current,
+            @RequestParam(defaultValue = "10") Integer size) {
+        return Result.success(wrongQuestionService.page(user.getUserId(), mastered, keyword, current, size));
+    }
+
+    @Operation(summary = "我的错题（兼容旧接口，不分页）")
+    @GetMapping("/list")
+    public Result<List<Map<String, Object>>> list(
             @AuthenticationPrincipal LoginUser user,
             @RequestParam(required = false) Boolean mastered) {
         return Result.success(wrongQuestionService.myWrongQuestions(user.getUserId(), mastered));

@@ -8,6 +8,7 @@ import com.aiqb.security.LoginUser;
 import com.aiqb.service.ExamService;
 import com.aiqb.vo.ExamResultVO;
 import com.aiqb.vo.ExamStartVO;
+import com.aiqb.vo.ExamVO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,11 +30,11 @@ public class ExamController {
 
     @Operation(summary = "分页查询（教师/管理员）")
     @GetMapping
-    public Result<IPage<Exam>> page(
-            @RequestParam(defaultValue = "1") Integer pageNum,
-            @RequestParam(defaultValue = "10") Integer pageSize,
+    public Result<IPage<ExamVO>> page(
+            @RequestParam(defaultValue = "1") Integer current,
+            @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) String status) {
-        return Result.success(examService.page(pageNum, pageSize, status));
+        return Result.success(examService.page(current, size, status));
     }
 
     @Operation(summary = "创建考试（草稿）")
@@ -102,5 +103,11 @@ public class ExamController {
     @GetMapping("/my-records")
     public Result<List<Map<String, Object>>> myRecords(@AuthenticationPrincipal LoginUser user) {
         return Result.success(examService.myRecords(user.getUserId()));
+    }
+
+    @Operation(summary = "教师：查某场考试的所有学生答卷")
+    @GetMapping("/{id}/records")
+    public Result<List<Map<String, Object>>> examRecords(@PathVariable Long id) {
+        return Result.success(examService.examRecords(id));
     }
 }

@@ -2,6 +2,7 @@ package com.aiqb.service;
 
 import com.aiqb.dto.QuestionDTO;
 import com.aiqb.entity.Question;
+import com.aiqb.vo.QuestionVO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,7 +11,9 @@ import java.util.List;
 
 public interface QuestionService {
 
-    IPage<Question> page(Long subjectId, String type, String keyword, Integer pageNum, Integer pageSize);
+    IPage<Question> page(Long subjectId, String type, String keyword, Integer difficulty, Integer pageNum, Integer pageSize);
+
+    IPage<QuestionVO> pageVO(Long subjectId, String type, String keyword, Integer difficulty, Integer current, Integer size);
 
     Question getById(Long id);
 
@@ -20,8 +23,13 @@ public interface QuestionService {
 
     void delete(List<Long> ids);
 
-    /** 随机抽题 */
-    List<Question> randomPick(Long subjectId, String type, Integer difficulty, String knowledgePoint, Integer limit);
+    /** 随机抽题（兼容旧调用） */
+    default List<Question> randomPick(Long subjectId, String type, Integer difficulty, String knowledgePoint, Integer limit) {
+        return randomPick(subjectId, type, difficulty, knowledgePoint, limit, null);
+    }
+
+    /** 随机抽题（支持排除指定 id） */
+    List<Question> randomPick(Long subjectId, String type, Integer difficulty, String knowledgePoint, Integer limit, Long excludeId);
 
     /** 批量导入（Excel） */
     int importFromExcel(MultipartFile file, Long subjectId, Long userId);

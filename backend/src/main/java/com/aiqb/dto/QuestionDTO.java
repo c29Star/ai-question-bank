@@ -31,4 +31,7 @@ public class QuestionDTO {
     private String explanation;
 
     private String knowledgePoint;
+
+    /** 题目默认分值（录入时填写，可选，默认 5） */
+    private Integer score;
 }

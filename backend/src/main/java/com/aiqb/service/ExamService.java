@@ -5,6 +5,7 @@ import com.aiqb.dto.SubmitAnswerDTO;
 import com.aiqb.entity.Exam;
 import com.aiqb.vo.ExamResultVO;
 import com.aiqb.vo.ExamStartVO;
+import com.aiqb.vo.ExamVO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import java.util.List;
@@ -23,8 +24,8 @@ public interface ExamService {
 
     void archive(Long id);
 
-    /** 教师/管理员：列出所有考试 */
-    IPage<Exam> page(Integer pageNum, Integer pageSize, String status);
+    /** 教师/管理员：列出所有考试（带 paperName） */
+    IPage<ExamVO> page(Integer pageNum, Integer pageSize, String status);
 
     /** 学生：可参加的考试 */
     List<Map<String, Object>> available(Long userId);
@@ -40,4 +41,7 @@ public interface ExamService {
 
     /** 学生：历史记录 */
     List<Map<String, Object>> myRecords(Long userId);
+
+    /** 教师：查某场考试的所有学生答卷 */
+    List<Map<String, Object>> examRecords(Long examId);
 }

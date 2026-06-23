@@ -28,6 +28,7 @@
             <if test="knowledgePoint != null and knowledgePoint != ''">
                 AND knowledge_point = #{knowledgePoint}
             </if>
+            <if test="excludeId != null">AND id != #{excludeId}</if>
         </where>
         ORDER BY RAND()
         LIMIT #{limit}

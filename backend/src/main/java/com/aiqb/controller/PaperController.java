@@ -3,10 +3,11 @@ package com.aiqb.controller;
 import com.aiqb.common.Result;
 import com.aiqb.dto.AutoPaperDTO;
 import com.aiqb.dto.PaperDTO;
-import com.aiqb.entity.Paper;
 import com.aiqb.security.LoginUser;
 import com.aiqb.service.PaperService;
 import com.aiqb.vo.PaperDetailVO;
+import com.aiqb.vo.PaperVO;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,10 +25,19 @@ public class PaperController {
 
     private final PaperService paperService;
 
-    @Operation(summary = "列表")
+    @Operation(summary = "分页列表（含 subjectName、questionCount）")
     @GetMapping
-    public Result<List<Paper>> list(@RequestParam(required = false) Long subjectId) {
-        return Result.success(paperService.list(subjectId));
+    public Result<IPage<PaperVO>> page(
+            @RequestParam(required = false) Long subjectId,
+            @RequestParam(defaultValue = "1") Integer current,
+            @RequestParam(defaultValue = "10") Integer size) {
+        return Result.success(paperService.page(subjectId, current, size));
+    }
+
+    @Operation(summary = "全部列表（简化 VO）")
+    @GetMapping("/list")
+    public Result<List<PaperVO>> list(@RequestParam(required = false) Long subjectId) {
+        return Result.success(paperService.listVO(subjectId));
     }
 
     @Operation(summary = "详情（含题目）")

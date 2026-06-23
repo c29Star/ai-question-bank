@@ -39,7 +39,8 @@ jwt:
 # 通义千问 AI
 ai:
   dashscope:
-    api-key: ${DASHSCOPE_API_KEY:replace-with-your-key}
+    # 真实 key 通过系统环境变量 DASHSCOPE_API_KEY 注入，避免进 Git/截图泄露
+    api-key: ${DASHSCOPE_API_KEY:}
     base-url: https://dashscope.aliyuncs.com/api/v1
     model: qwen-plus
 
