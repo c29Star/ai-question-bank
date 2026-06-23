@@ -169,5 +169,71 @@
 
 **遗留事项**：无。
 
+---
+
+### 会话 #4 — 2026-06-23 ~ 2026-06-24 凌晨 GitHub 部署
+
+**会话起点**：用户要求按论文"4.6 项目部署 / 学会 git 部署 / 2.3 代码质量与规范（Git 提交信息清晰、记录完整）"要求，把项目推到 GitHub。
+
+**任务结果**：✅ 仓库已创建并推送完成
+
+**关键信息**：
+- GitHub 用户名：`c29Star`
+- 仓库地址：https://github.com/c29Star/ai-question-bank
+- 仓库类型：Public（论文要求公开）
+- 默认分支：master
+- 推送 commit 总数：6
+
+**commit 列表**（push 后 GitHub 上的状态）：
+```
+0bfd4ea  chore: 补充 .gitignore 与工作日志           -- c29Star
+b9abeb7  feat(frontend): 前端样式升级、API 整合与视图完善  -- c29Star
+d95a4e0  feat(backend): 后端 API 完善、业务优化与种子数据  -- c29Star
+00df8ed  fix(login): 修复登录持久化，支持会话级和 7 天免登录双层存储  -- c29Star
+f194dbb  chore: 补全仓库元数据（LICENSE 与 frontend/.gitignore）  -- c29Star
+fcef914  feat: 初始版本 - AI 智能题库系统 (Spring Boot 3 + Vue 3)  -- Student
+```
+（注意：fcef914 作者是 `Student <1957403649@qq.com>`——这是历史 commit，**不修改**，保留以体现真实开发过程。如果评分老师介意，后续可单独处理。）
+
+**已完成工作**：
+
+1. ✅ **安全扫描**：发现 `application-dev.yml` 里 DB_PASSWORD 默认值被误写为 `abc123`（用户本地 MySQL 密码），回退到占位符 `please-set-your-password`
+2. ✅ **API Key 改进**：`application.yml` 中 `ai.dashscope.api-key` 改为完全从环境变量 `DASHSCOPE_API_KEY` 读取，避免泄露
+3. ✅ **新增 LICENSE**：MIT 协议
+4. ✅ **完善 .gitignore**：
+   - 新增 `edge-*/`（浏览器调试用户数据目录）
+   - 新增 `preview-*.png` / `preview-*.html`（开发调试临时预览）
+   - 新增 `.git-commit-msg-*.txt`（commit 用的临时 message 文件）
+   - 新增 `.vite/`（Vite 缓存）
+   - 补全并恢复 `frontend/.gitignore`
+5. ✅ **拆分 6 个 commit**：每个 commit 用 Conventional Commits 风格（feat/fix/chore），message 含主题+正文，符合论文"提交记录清晰、记录完整"
+6. ✅ **GitHub 仓库创建**：用户在 https://github.com/new 网页创建（fine-grained token 不允许 `POST /user/repos`，改走网页）
+7. ✅ **Push 成功**：`git push -u origin master` 完成
+8. ✅ **凭据清理**：临时 token 文件 `C:\Users\pbyl0\Desktop\token.txt` 移到回收站；git remote URL 恢复成不含 token 的形式
+
+**踩坑笔记（给后续会话参考）**：
+- **fine-grained PAT 不能用于 `POST /user/repos`**：会返回 403 "Resource not accessible by personal access token"。创建仓库必须走网页（https://github.com/new）。
+- **PowerShell + git 多 `-m` 中文 message 会被截断**：用 `-F <file>` 写到临时文件再 commit 最稳。
+- **`LF will be replaced by CRLF` 警告**：Windows + git autocrlf 默认行为，无害。如果想消除，在 `.gitattributes` 加 `* text=auto eol=lf`（不强制要求）。
+- **Windows `Remove-Item` 被安全规则挡住**：临时文件用 `mavis-trash` 移到回收站最稳。
+
+**论文"4.6 项目部署"章节可直接引用的话术**：
+> 本项目已部署到 GitHub：https://github.com/c29Star/ai-question-bank  
+> 仓库地址：https://github.com/c29Star/ai-question-bank.git  
+> 提交记录共 6 次：初始版本 → 仓库元数据 → 登录持久化修复 → 后端完善 → 前端升级 → 文档  
+> 本地运行：
+> ```bash
+> git clone https://github.com/c29Star/ai-question-bank.git
+> cd ai-question-bank
+> # 启动 MySQL 并导入 schema
+> mysql -u root -p < backend/src/main/resources/sql/schema.sql
+> # 启动后端
+> cd backend && mvn spring-boot:run
+> # 另开终端启动前端
+> cd frontend && npm install && npm run dev
+> ```
+
+**遗留事项**：无。
+
 
 
