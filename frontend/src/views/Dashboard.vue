@@ -259,13 +259,72 @@ async function renderSubject() {
     return
   }
   subjectInst.setOption({
-    tooltip: { trigger: 'item', backgroundColor: 'rgba(255,255,255,0.95)', borderColor: '#fed7aa', textStyle: { color: '#44403c' } },
-    legend: { bottom: 0, textStyle: { color: '#78716c' } },
-    color: ['#fb923c', '#fb7185', '#5eead4', '#a78bfa', '#fbbf24', '#7dd3fc', '#84cc16', '#f43f5e'],
+    tooltip: {
+      trigger: 'item',
+      backgroundColor: 'rgba(255,255,255,0.95)',
+      borderColor: '#fed7aa',
+      textStyle: { color: '#44403c' },
+      formatter: (p) => `<b>${p.name}</b><br/>${p.value} 题 · ${p.percent}%`,
+    },
+    legend: {
+      type: 'scroll',
+      orient: 'horizontal',
+      bottom: 0,
+      left: 'center',
+      itemWidth: 10,
+      itemHeight: 10,
+      itemGap: 10,
+      textStyle: { color: '#78716c', fontSize: 12 },
+      pageIconColor: '#fb923c',
+      pageTextStyle: { color: '#78716c' },
+      // 图例只显示科目名（不显示百分比，避免和饼图外圈重复 + 防止 10 项拥挤）
+      formatter: (name) => name,
+    },
+    color: ['#fb923c', '#fb7185', '#5eead4', '#a78bfa', '#fbbf24', '#7dd3fc', '#84cc16', '#f43f5e', '#fda4af', '#c4b5fd'],
     series: [{
-      type: 'pie', radius: ['45%', '72%'], center: ['50%', '45%'], data: subjectData,
-      label: { formatter: '{b}\n{d}%', color: '#44403c', fontWeight: 600 },
-      itemStyle: { borderRadius: 8, borderColor: '#fff', borderWidth: 3 },
+      type: 'pie',
+      radius: ['32%', '58%'],
+      center: ['50%', '45%'],
+      avoidLabelOverlap: true,
+      minAngle: 8,
+      data: subjectData,
+      // 外圈标签：科目名 + 百分比，ECharts 自动避让 + 自动折叠
+      label: {
+        show: true,
+        position: 'outside',
+        formatter: (p) => `${p.name}\n${p.percent}%`,
+        color: '#44403c',
+        fontWeight: 600,
+        fontSize: 11,
+        lineHeight: 14,
+        align: 'center',
+      },
+      labelLine: {
+        show: true,
+        length: 6,
+        length2: 10,
+        lineStyle: { color: '#a8a29e', width: 1 },
+      },
+      labelLayout: {
+        // 关键：开启 hideOverlap 后，相邻标签会自动隐藏/合并，
+        // 数据多也不会重叠成一片
+        hideOverlap: true,
+        moveOverlap: 'shiftY',
+      },
+      itemStyle: { borderRadius: 6, borderColor: '#fff', borderWidth: 2 },
+      emphasis: {
+        scale: true,
+        scaleSize: 6,
+        label: {
+          show: true,
+          position: 'center',
+          formatter: (p) => `{b|${p.name}}\n{d|${p.percent}%}`,
+          rich: {
+            b: { fontSize: 14, color: '#44403c', fontWeight: 600, lineHeight: 22 },
+            d: { fontSize: 22, color: '#fb923c', fontWeight: 700, lineHeight: 28 },
+          },
+        },
+      },
     }],
   })
 }

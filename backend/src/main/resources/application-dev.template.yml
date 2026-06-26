@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ai_question_bank?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    # ⚠️ 本地密码占位符，不要把真实密码写在这里
+    # 真实密码请改 application-dev.local.yml（已被 .gitignore，不会推上 GitHub）
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:please-set-your-password}
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DB:0}
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-wait: -1ms
+          max-idle: 8
+          min-idle: 0
+
+  # 临时禁用 Redis 自动装配：本地未装 Redis 服务，避免启动失败。
+  # 2026-06-26 启动用；将来装了 Redis，把下面 autoconfigure.exclude 整段删掉即可
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration

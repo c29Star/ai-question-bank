@@ -16,6 +16,17 @@ backend/target/
 .env
 .env.local
 
+# 本地开发用 Spring Boot 配置（含真实密码，不会推上 GitHub）
+**/application-dev.yml
+**/application-dev.local.yml
+**/application.local.yml
+
+# 本地启动脚本（含 PowerShell 环境变量读取路径）
+start.ps1
+stop.ps1
+一键启动.bat
+run-dev.bat
+
 # IDE
 .idea/
 .vscode/
@@ -30,6 +41,8 @@ logs/
 
 # Vite cache
 .vite/
+# Vite 临时文件（dev server 偶尔生成）
+frontend/vite.config.js.timestamp-*.mjs
 
 # Edge / Chrome 浏览器调试用户数据目录（不要上传）
 edge-*/
