@@ -1,7 +1,5 @@
 package com.aiqb.vo;
 
-import com.aiqb.entity.Answer;
-import com.aiqb.entity.Question;
 import lombok.Data;
 
 import java.util.List;
@@ -14,7 +12,8 @@ public class ExamResultVO {
 
     @Data
     public static class QuestionResult {
-        private Question question;
+        /** 题目详情（含正确答案 + 解析 + options 数组）—— 交卷后学生应能看到对错与解析 */
+        private QuestionVO question;
         private String userAnswer;
         private Boolean isCorrect;
         private Integer score;

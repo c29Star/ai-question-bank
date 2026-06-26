@@ -52,6 +52,12 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public IPage<QuestionVO> pageVO(Long subjectId, String type, String keyword, Integer difficulty, Integer current, Integer size) {
+        return pageVO(subjectId, type, keyword, difficulty, current, size, true);
+    }
+
+    @Override
+    public IPage<QuestionVO> pageVO(Long subjectId, String type, String keyword, Integer difficulty,
+                                    Integer current, Integer size, boolean includeAnswer) {
         IPage<Question> pg = page(subjectId, type, keyword, difficulty, current, size);
         // 批量取科目名
         List<Question> records = pg.getRecords();
@@ -62,7 +68,9 @@ public class QuestionServiceImpl implements QuestionService {
                 subjectNameMap.put(q.getSubjectId(), s == null ? null : s.getName());
             }
         }
-        return pg.convert(q -> QuestionVO.from(q, subjectNameMap.get(q.getSubjectId())));
+        return pg.convert(q -> includeAnswer
+                ? QuestionVO.from(q, subjectNameMap.get(q.getSubjectId()))
+                : QuestionVO.forStudent(q, subjectNameMap.get(q.getSubjectId())));
     }
 
     @Override
@@ -70,6 +78,17 @@ public class QuestionServiceImpl implements QuestionService {
         Question q = questionMapper.selectById(id);
         if (q == null) throw BusinessException.notFound("题目不存在");
         return q;
+    }
+
+    @Override
+    public QuestionVO getVOById(Long id, boolean includeAnswer) {
+        Question q = getById(id);
+        String subjectName = null;
+        if (q.getSubjectId() != null) {
+            Subject s = subjectMapper.selectById(q.getSubjectId());
+            if (s != null) subjectName = s.getName();
+        }
+        return includeAnswer ? QuestionVO.from(q, subjectName) : QuestionVO.forStudent(q, subjectName);
     }
 
     @Override

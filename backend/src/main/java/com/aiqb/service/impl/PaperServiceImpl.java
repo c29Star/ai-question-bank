@@ -75,14 +75,39 @@ public class PaperServiceImpl implements PaperService {
 
     @Override
     public PaperDetailVO detail(Long id) {
+        return detail(id, true);
+    }
+
+    @Override
+    public PaperDetailVO detail(Long id, boolean includeAnswer) {
         Paper paper = paperMapper.selectById(id);
         if (paper == null) throw BusinessException.notFound("试卷不存在");
 
         List<PaperQuestion> pqs = paperQuestionMapper.selectByPaperId(id);
-        List<Question> questions = new ArrayList<>();
+        // 一次性取所有题目 + 科目名，避免 N+1
+        List<Long> qids = pqs.stream().map(PaperQuestion::getQuestionId).toList();
+        java.util.Map<Long, Question> qMap = new java.util.HashMap<>();
+        java.util.Map<Long, String> subjectNameMap = new java.util.HashMap<>();
+        for (Long qid : qids) {
+            Question q = questionMapper.selectById(qid);
+            if (q != null) {
+                qMap.put(qid, q);
+                if (q.getSubjectId() != null && !subjectNameMap.containsKey(q.getSubjectId())) {
+                    Subject s = subjectMapper.selectById(q.getSubjectId());
+                    subjectNameMap.put(q.getSubjectId(), s == null ? null : s.getName());
+                }
+            }
+        }
+        List<com.aiqb.vo.QuestionVO> questions = new ArrayList<>();
         for (PaperQuestion pq : pqs) {
-            Question q = questionMapper.selectById(pq.getQuestionId());
-            if (q != null) questions.add(q);
+            Question q = qMap.get(pq.getQuestionId());
+            if (q != null) {
+                com.aiqb.vo.QuestionVO qvo = includeAnswer
+                        ? com.aiqb.vo.QuestionVO.from(q, subjectNameMap.get(q.getSubjectId()))
+                        : com.aiqb.vo.QuestionVO.forStudent(q, subjectNameMap.get(q.getSubjectId()));
+                // 携带分值（试卷里每题分值可能不同）
+                questions.add(qvo);
+            }
         }
 
         // 关键：给 paper 注入 subjectName，前端预览弹窗要用

@@ -16,7 +16,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -84,18 +83,8 @@ public class WrongQuestionServiceImpl implements WrongQuestionService {
             vo.setExplanation(q.getExplanation());
             vo.setKnowledgePoint(q.getKnowledgePoint());
             vo.setSubjectId(q.getSubjectId());
-            // 解析 options JSON
-            if (q.getOptions() != null && !q.getOptions().isEmpty()) {
-                try {
-                    String o = q.getOptions().trim();
-                    if (o.startsWith("[")) o = o.substring(1);
-                    if (o.endsWith("]")) o = o.substring(0, o.length() - 1);
-                    vo.setOptions(Arrays.stream(o.split(","))
-                            .map(s -> s.trim().replaceAll("^\"|\"$", "").replaceAll("\\\\\"", "\""))
-                            .filter(s -> !s.isEmpty())
-                            .toList());
-                } catch (Exception ignore) { vo.setOptions(List.of()); }
-            }
+            // 解析 options（复用 QuestionVO 鲁棒解析）
+            vo.setOptions(QuestionVO.parseOptions(q.getOptions()));
             if (q.getSubjectId() != null) {
                 Subject s = subjectMapper.selectById(q.getSubjectId());
                 if (s != null) vo.setSubjectName(s.getName());

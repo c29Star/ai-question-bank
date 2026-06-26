@@ -52,22 +52,44 @@
         </div>
         <div class="q-content">{{ currentQ.content }}</div>
 
-        <!-- 单选/判断 -->
-        <el-radio-group v-if="currentQ.type === 'SINGLE' || currentQ.type === 'JUDGE'" v-model="answers[currentQ.questionId]" class="q-opts" @change="(v) => onAnswer(currentQ.questionId, v)">
+        <!-- 单选/多选/判断：options 为空时给出友好提示，避免出现"题干在但没选项"的诡异空白 -->
+        <el-alert
+          v-if="['SINGLE', 'MULTIPLE', 'JUDGE'].includes(currentQ.type) && (!currentQ.options || currentQ.options.length === 0)"
+          type="warning"
+          :closable="false"
+          title="本题暂无选项数据，请联系老师补充"
+          show-icon
+          style="margin-bottom: 16px"
+        />
+
+        <!-- 单选 -->
+        <el-radio-group v-if="currentQ.type === 'SINGLE'" v-model="answers[currentQ.questionId]" class="q-opts" @change="(v) => onAnswer(currentQ.questionId, v)">
           <el-radio v-for="(o, i) in currentQ.options" :key="i" :value="String.fromCharCode(65 + i)" class="q-opt">{{ String.fromCharCode(65 + i) }}. {{ o }}</el-radio>
+        </el-radio-group>
+        <!-- 判断题：固定"对 / 错"两个按钮，与入库 options 无关 -->
+        <el-radio-group v-else-if="currentQ.type === 'JUDGE'" v-model="answers[currentQ.questionId]" class="q-opts" @change="(v) => onAnswer(currentQ.questionId, v)">
+          <el-radio value="T" class="q-opt">✓ 正确</el-radio>
+          <el-radio value="F" class="q-opt">✗ 错误</el-radio>
         </el-radio-group>
         <!-- 多选 -->
         <el-checkbox-group v-else-if="currentQ.type === 'MULTIPLE'" v-model="answers[currentQ.questionId]" class="q-opts" @change="(v) => onAnswer(currentQ.questionId, v.join(''))">
           <el-checkbox v-for="(o, i) in currentQ.options" :key="i" :value="String.fromCharCode(65 + i)" class="q-opt">{{ String.fromCharCode(65 + i) }}. {{ o }}</el-checkbox>
         </el-checkbox-group>
-        <!-- 填空/简答 -->
+        <!-- 填空 / 简答 / 计算题 / 问答 -->
         <el-input
-          v-else-if="currentQ.type === 'FILL' || currentQ.type === 'ESSAY'"
+          v-else-if="['FILL', 'ESSAY', 'QA', 'CALC'].includes(currentQ.type)"
           v-model="answers[currentQ.questionId]"
           type="textarea"
-          :rows="4"
-          placeholder="请输入答案"
+          :rows="currentQ.type === 'FILL' ? 2 : 6"
+          :placeholder="currentQ.type === 'FILL' ? '请输入填空答案' : '请输入作答内容'"
           @input="(v) => onAnswer(currentQ.questionId, v)"
+        />
+        <!-- 兜底：未知题型（防止新增类型后页面空白） -->
+        <el-alert
+          v-else
+          type="warning"
+          :closable="false"
+          :title="`暂不支持的题型：${currentQ.type}（${typeLabel(currentQ.type)}），请联系管理员`"
         />
 
         <div class="q-foot">
@@ -161,10 +183,12 @@ async function start() {
       ...(q.question || {}),
       // options 是 JSON 字符串，解析为数组
       options: typeof q.question?.options === 'string' ? parseOptions(q.question.options) : (q.question?.options || []),
+      // 用后端返回的 savedAnswer 字段回显，question.answer 是正确答案不能直接用
+      savedAnswer: q.savedAnswer || null,
     }))
-    // 回显已保存的答案
+    // 回显已保存的答案（仅续答场景才会有）
     questions.value.forEach(q => {
-      if (q.answer) answers[q.questionId] = q.answer
+      if (q.savedAnswer) answers[q.questionId] = q.savedAnswer
     })
     // 初始化倒计时
     if (paper.value.duration) {
@@ -181,12 +205,26 @@ async function start() {
 }
 
 function parseOptions(s) {
-  if (!s) return []
+  if (s == null) return []
+  // 已经是数组
+  if (Array.isArray(s)) return s.filter(x => x != null && String(x).length > 0)
+  const str = String(s).trim()
+  if (!str) return []
+  // 1) 优先按 JSON 解析（最稳，能正确处理包含逗号/引号/转义的选项）
+  if (str.startsWith('[') && str.endsWith(']')) {
+    try {
+      const arr = JSON.parse(str)
+      if (Array.isArray(arr)) return arr.map(x => String(x).trim()).filter(Boolean)
+    } catch (_) { /* 退回到字符串切分 */ }
+  }
+  // 2) 兜底：去掉中括号后按逗号切，剥外层引号
   try {
-    let o = s.trim()
+    let o = str
     if (o.startsWith('[')) o = o.substring(1)
-    if (o.endsWith(']')) o = o.substring(0, o.length() - 1)
-    return o.split(',').map(x => x.trim().replaceAll(/^"|"$/g, '').replaceAll('\\"', '"')).filter(Boolean)
+    if (o.endsWith(']')) o = o.substring(0, o.length - 1)
+    return o.split(',')
+      .map(x => x.trim().replaceAll(/^"|"$/g, '').replaceAll('\\"', '"'))
+      .filter(Boolean)
   } catch { return [] }
 }
 

@@ -42,8 +42,9 @@ public class PaperController {
 
     @Operation(summary = "详情（含题目）")
     @GetMapping("/{id}")
-    public Result<PaperDetailVO> detail(@PathVariable Long id) {
-        return Result.success(paperService.detail(id));
+    public Result<PaperDetailVO> detail(@PathVariable Long id, @AuthenticationPrincipal LoginUser user) {
+        boolean include = user != null && ("TEACHER".equals(user.getRole()) || "ADMIN".equals(user.getRole()));
+        return Result.success(paperService.detail(id, include));
     }
 
     @Operation(summary = "创建试卷")

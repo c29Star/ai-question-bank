@@ -10,6 +10,7 @@ import com.aiqb.vo.ExamQuestionVO;
 import com.aiqb.vo.ExamResultVO;
 import com.aiqb.vo.ExamStartVO;
 import com.aiqb.vo.ExamVO;
+import com.aiqb.vo.QuestionVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -185,17 +186,34 @@ public class ExamServiceImpl implements ExamService {
         Paper paper = paperMapper.selectById(exam.getPaperId());
         List<PaperQuestion> pqs = paperQuestionMapper.selectByPaperId(paper.getId());
         List<ExamQuestionVO> questionVOs = new ArrayList<>();
+        // 一次性查出所有相关科目，避免 N+1
+        java.util.Set<Long> subjectIds = new java.util.HashSet<>();
+        for (PaperQuestion pq : pqs) {
+            Question qq = questionMapper.selectById(pq.getQuestionId());
+            if (qq != null) subjectIds.add(qq.getSubjectId());
+        }
+        java.util.Map<Long, String> subjectNameMap = new java.util.HashMap<>();
+        for (Long sid : subjectIds) {
+            var s = subjectMapper.selectById(sid);
+            if (s != null) subjectNameMap.put(sid, s.getName());
+        }
         for (PaperQuestion pq : pqs) {
             Question q = questionMapper.selectById(pq.getQuestionId());
             if (q == null) continue;
+            String subjectName = subjectNameMap.get(q.getSubjectId());
             ExamQuestionVO vo = new ExamQuestionVO();
             vo.setQuestionId(q.getId());
             vo.setScore(pq.getScore());
             vo.setSortOrder(pq.getSortOrder());
-            vo.setQuestion(q);
+            // 用 QuestionVO 包装，options 字段会自动解析为 List<String>
+            QuestionVO qvo = QuestionVO.from(q, subjectName);
+            // ⚠️ 安全：考试作答接口绝对不能把正确答案泄给学生
+            qvo.setAnswer(null);
+            qvo.setExplanation(null);
+            vo.setQuestion(qvo);
             questionVOs.add(vo);
         }
-        // 取已作答的答案
+        // 取已作答的答案（续答场景），存到 savedAnswer 字段而非 question.answer
         List<Answer> savedAnswers = answerMapper.selectByRecordId(record.getId());
         Map<Long, String> userAnswerMap = new HashMap<>();
         for (Answer a : savedAnswers) {
@@ -203,7 +221,7 @@ public class ExamServiceImpl implements ExamService {
         }
         for (ExamQuestionVO vo : questionVOs) {
             String ua = userAnswerMap.get(vo.getQuestionId());
-            if (ua != null) vo.getQuestion().setAnswer(ua); // 暂存到 answer 字段用于前端回显
+            if (ua != null) vo.setSavedAnswer(ua);
         }
 
         ExamStartVO startVO = new ExamStartVO();
@@ -397,11 +415,24 @@ public class ExamServiceImpl implements ExamService {
         vo.setScore(record.getScore());
         vo.setTotalScore(record.getTotalScore());
         List<ExamResultVO.QuestionResult> results = new ArrayList<>();
+        // 一次性查所有科目名，避免 N+1
+        java.util.Set<Long> subjectIds = new java.util.HashSet<>();
+        for (Answer a : answers) {
+            Question qq = questionMapper.selectById(a.getQuestionId());
+            if (qq != null && qq.getSubjectId() != null) subjectIds.add(qq.getSubjectId());
+        }
+        java.util.Map<Long, String> subjectNameMap = new java.util.HashMap<>();
+        for (Long sid : subjectIds) {
+            var s = subjectMapper.selectById(sid);
+            if (s != null) subjectNameMap.put(sid, s.getName());
+        }
         for (Answer a : answers) {
             Question q = questionMapper.selectById(a.getQuestionId());
             if (q == null) continue;
             ExamResultVO.QuestionResult r = new ExamResultVO.QuestionResult();
-            r.setQuestion(q);
+            // 交卷后结果：使用 QuestionVO 包装，options 自动解析为 List<String>
+            // 此处刻意保留 answer/explanation（交卷后学生应能看对错与解析）
+            r.setQuestion(QuestionVO.from(q, subjectNameMap.get(q.getSubjectId())));
             r.setUserAnswer(a.getUserAnswer());
             r.setIsCorrect(a.getIsCorrect());
             r.setScore(a.getScore());

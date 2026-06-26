@@ -157,7 +157,19 @@ public class AiServiceImpl implements AiService {
                             newQ.setType(q.getType());
                             newQ.setDifficulty(q.getDifficulty());
                             newQ.setContent(item.path("content").asText());
-                            newQ.setOptions(item.path("options").toString());
+                            // options 字段是 JSON 数组，需要用 ObjectMapper 序列化为合法 JSON 字符串存库，
+                            // 不能用 JsonNode.toString()——那会输出带转义引号的字面量。
+                            JsonNode optionsNode = item.path("options");
+                            if (optionsNode != null && !optionsNode.isMissingNode() && !optionsNode.isNull()) {
+                                try {
+                                    newQ.setOptions(optionsNode.isArray()
+                                            ? objectMapper.writeValueAsString(optionsNode)
+                                            : optionsNode.asText());
+                                } catch (Exception ex) {
+                                    log.warn("options 序列化失败，降级为原文", ex);
+                                    newQ.setOptions(optionsNode.toString());
+                                }
+                            }
                             newQ.setAnswer(item.path("answer").asText());
                             newQ.setExplanation(item.path("explanation").asText());
                             newQ.setKnowledgePoint(q.getKnowledgePoint());

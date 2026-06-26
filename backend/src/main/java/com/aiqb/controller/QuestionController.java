@@ -28,6 +28,11 @@ public class QuestionController {
 
     private final QuestionService questionService;
 
+    /** 角色判断：教师/管理员才返回正确答案，学生一律剥离 */
+    private static boolean canSeeAnswer(String role) {
+        return "TEACHER".equals(role) || "ADMIN".equals(role);
+    }
+
     @Operation(summary = "分页查询（带 subjectName）")
     @GetMapping
     public Result<IPage<QuestionVO>> page(
@@ -36,14 +41,17 @@ public class QuestionController {
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Integer difficulty,
             @RequestParam(defaultValue = "1") Integer current,
-            @RequestParam(defaultValue = "10") Integer size) {
-        return Result.success(questionService.pageVO(subjectId, type, keyword, difficulty, current, size));
+            @RequestParam(defaultValue = "10") Integer size,
+            @AuthenticationPrincipal LoginUser user) {
+        boolean include = user != null && canSeeAnswer(user.getRole());
+        return Result.success(questionService.pageVO(subjectId, type, keyword, difficulty, current, size, include));
     }
 
     @Operation(summary = "获取详情")
     @GetMapping("/{id}")
-    public Result<Question> getById(@PathVariable Long id) {
-        return Result.success(questionService.getById(id));
+    public Result<QuestionVO> getById(@PathVariable Long id, @AuthenticationPrincipal LoginUser user) {
+        boolean include = user != null && canSeeAnswer(user.getRole());
+        return Result.success(questionService.getVOById(id, include));
     }
 
     @Operation(summary = "创建题目")
@@ -70,13 +78,15 @@ public class QuestionController {
 
     @Operation(summary = "随机抽题")
     @GetMapping("/random")
-    public Result<List<Question>> randomPick(
+    public Result<List<QuestionVO>> randomPick(
             @RequestParam Long subjectId,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) Integer difficulty,
             @RequestParam(required = false) String knowledgePoint,
-            @RequestParam(defaultValue = "10") Integer limit) {
-        return Result.success(questionService.randomPick(subjectId, type, difficulty, knowledgePoint, limit));
+            @RequestParam(defaultValue = "10") Integer limit,
+            @AuthenticationPrincipal LoginUser user) {
+        boolean include = user != null && canSeeAnswer(user.getRole());
+        return Result.success(questionService.randomPickVO(subjectId, type, difficulty, knowledgePoint, limit, null, include));
     }
 
     @Operation(summary = "导入 Excel")

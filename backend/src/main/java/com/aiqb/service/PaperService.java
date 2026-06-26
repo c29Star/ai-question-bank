@@ -19,6 +19,11 @@ public interface PaperService {
 
     PaperDetailVO detail(Long id);
 
+    /** 试卷详情，按是否带答案（学生端应传 false） */
+    default PaperDetailVO detail(Long id, boolean includeAnswer) {
+        return detail(id);
+    }
+
     Long create(PaperDTO dto, Long userId);
 
     void update(PaperDTO dto);
